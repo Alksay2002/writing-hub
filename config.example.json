@@ -1,0 +1,8 @@
+{
+  "_注释": "这是可选的手动配置文件。有它就覆盖自动探测；删掉或改名就走自动探测。",
+  "roots": [
+    {"id": "wb",   "name": "WorkBuddy",  "path": "C:\\Users\\你的用户名\\WorkBuddy"},
+    {"id": "trae", "name": "Trae 交付",  "path": "C:\\Users\\你的用户名\\Documents\\Trae-CN"},
+    {"id": "custom1", "name": "我的自定义目录", "path": "D:\\work\\writing"}
+  ]
+}
