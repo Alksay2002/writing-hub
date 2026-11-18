@@ -1,0 +1,29 @@
+# 运行时生成
+.state.json
+runtime.json
+writinghub.log
+.bak/
+.backup/
+日报/
+*.log
+*.bak
+
+# 构建产物
+*.exe
+*.zip
+*.rar
+*.7z
+/写作库_发布包/
+/dist/
+/build/
+*.spec
+
+# 构建脚本（内部使用，不进发布仓库）
+build.py
+setup.iss
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+__pycache__/
+*.pyc
