@@ -81,6 +81,30 @@
   .tree .lvl2{padding-left:20px; font-size:12px}
   .tree .lvl3{padding-left:32px; font-size:12px; color:var(--dim)}
   .sidefoot{border-top:1px solid var(--hair); padding:10px; display:flex; gap:6px}
+  /* 语言 chip：侧栏品牌栏右上角，小圆角、等宽字体、点击快速切换 */
+  .lang-chip{
+    font-family:var(--mono); font-size:9.5px; letter-spacing:.06em;
+    padding:2px 6px; border-radius:10px; background:var(--panel-2);
+    color:var(--muted); border:1px solid var(--hair-2); cursor:pointer;
+    transition:color .12s, border-color .12s, background .12s;
+    user-select:none; flex:none;
+  }
+  .lang-chip:hover{ color:var(--brass); border-color:var(--brass-dim); background:color-mix(in srgb, var(--brass) 6%, transparent) }
+  html[data-theme="light"] .lang-chip{ border-color:var(--hair); background:var(--panel-2) }
+
+  /* 设置面板里的按钮组（语言/主题） */
+  .btnrow{ display:flex; gap:6px; flex-wrap:wrap }
+  .btnrow-item{
+    font-family:var(--sans); font-size:12px; padding:6px 12px;
+    background:var(--panel-2); border:1px solid var(--hair-2); color:var(--muted);
+    border-radius:6px; cursor:pointer; transition:all .15s;
+    letter-spacing:.02em;
+  }
+  .btnrow-item:hover{ color:var(--text); border-color:var(--brass-dim) }
+  .btnrow-item.on{
+    background:var(--brass); border-color:var(--brass); color:#0B0B0D; font-weight:600;
+  }
+  html[data-theme="light"] .btnrow-item.on{ color:#fff }
   .btn{
     background:var(--panel-2); border:1px solid var(--hair); color:var(--muted);
     border-radius:6px; padding:7px 10px; cursor:pointer; font-size:12px; white-space:nowrap;
@@ -129,22 +153,33 @@
   .list{padding:10px 12px 90px}
 
   .row{
-    display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center;
+    display:grid; grid-template-columns:1fr auto; gap:10px 14px; align-items:start;
     padding:10px 12px; border:1px solid transparent; border-radius:8px; cursor:pointer;
     border-bottom:1px solid var(--hair);
+    min-width:0;
   }
   .row:hover{background:var(--panel-2); border-color:var(--hair)}
   .row.on{background:var(--panel-2); border-color:var(--brass-dim)}
-  .row .t{font-size:13.5px; color:var(--text); font-weight:500; display:flex; align-items:center; gap:7px; min-width:0}
-  .row .t span{overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+  .row .t{font-size:13.5px; color:var(--text); font-weight:500; display:flex; align-items:flex-start; gap:7px; min-width:0}
+  .row .t span{
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    overflow:hidden; text-overflow:ellipsis; word-break:normal; overflow-wrap:break-word;
+    white-space:normal; line-height:1.45;
+  }
   .row.read .t span{color:var(--muted)}
   .row .meta{
-    display:flex; gap:8px; align-items:center; margin-top:3px;
-    font-family:var(--mono); font-size:10px; color:var(--dim); overflow:hidden; white-space:nowrap;
+    display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:3px;
+    font-family:var(--mono); font-size:10px; color:var(--dim); min-width:0;
+    word-break:normal; overflow-wrap:break-word; white-space:normal;
   }
-  .row .p{overflow:hidden; text-overflow:ellipsis; color:var(--dim)}
-  .row .ex{color:var(--muted); font-size:11.5px; margin-top:4px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-family:var(--sans)}
-  .row .rt{display:flex; align-items:center; gap:4px}
+  .row .meta .p{overflow:hidden; text-overflow:ellipsis; color:var(--dim); white-space:normal; word-break:normal}
+  .row .ex{
+    color:var(--muted); font-size:11.5px; margin-top:4px; font-family:var(--sans);
+    display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;
+    overflow:hidden; text-overflow:ellipsis; word-break:normal; overflow-wrap:break-word;
+    line-height:1.5;
+  }
+  .row .rt{display:flex; align-items:center; gap:4px; align-self:center}
   .tag{
     font-family:var(--mono); font-size:9px; letter-spacing:.04em; color:var(--slate);
     border:1px solid var(--hair-2); padding:1px 5px; border-radius:3px; flex:none;
@@ -366,9 +401,48 @@
     background:var(--panel); border:1px solid var(--hair-2); border-radius:12px; width:min(620px,100%);
     max-height:86vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 24px 60px rgba(0,0,0,.5);
   }
-  .modal h3{margin:0; padding:14px 18px; border-bottom:1px solid var(--hair); font-size:13.5px; letter-spacing:.05em}
-  .modal .mb{padding:16px 18px; overflow-y:auto; display:flex; flex-direction:column; gap:12px}
-  .modal .mf{padding:12px 18px; border-top:1px solid var(--hair); display:flex; gap:8px; justify-content:flex-end; align-items:center}
+  .modal h3{margin:0; padding:14px 20px; border-bottom:1px solid var(--hair); font-size:13.5px; letter-spacing:.05em; display:flex; align-items:center; gap:10px}
+  .modal .mb{padding:18px 20px; overflow-y:auto; display:flex; flex-direction:column; gap:18px}
+  .modal .mf{padding:12px 20px; border-top:1px solid var(--hair); display:flex; gap:8px; justify-content:flex-end; align-items:center}
+  /* 设置面板分组 */
+  .setgrp{
+    display:flex; flex-direction:column; gap:10px;
+    padding-bottom:14px; border-bottom:1px dashed var(--hair-2);
+  }
+  .setgrp:last-of-type{ border-bottom:none; padding-bottom:2px }
+  .setgrp-title{
+    font-family:var(--mono); font-size:10px; letter-spacing:.12em; color:var(--dim);
+    text-transform:uppercase; padding-bottom:4px;
+  }
+  /* 设置面板里"一行两个并排"的布局 */
+  .set2{ display:grid; grid-template-columns:1fr 1fr; gap:14px 16px; align-items:start }
+  .set1{ display:flex; flex-direction:column; gap:8px }
+  /* 小 label（在控件上方，不是 .field 的大 label） */
+  .slbl{ font-size:10.5px; color:var(--dim); letter-spacing:.02em; margin-bottom:3px }
+  .slbl .en-sub{
+    font-size:10px; font-family:var(--mono); color:var(--dim); letter-spacing:.08em;
+    text-transform:uppercase; opacity:.75; margin-left:4px;
+  }
+  .srow{ display:flex; align-items:center; gap:10px; flex-wrap:wrap }
+  .srow > :first-child{ flex:1 1 auto; min-width:0 }
+  .srow .sbtn{ flex:none; margin-left:auto; font-size:11px; padding:3px 10px }
+  /* checkbox 行：左边 label+checkbox，右边可加按钮 */
+  .chk-row{ display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--muted); cursor:pointer; user-select:none }
+  .chk-row input[type="checkbox"]{ accent-color:var(--brass); width:14px; height:14px; cursor:pointer }
+  /* about 分组：key/value 对 */
+  .kv{ display:grid; grid-template-columns:92px 1fr; gap:6px 16px; font-size:12.5px; align-items:center }
+  .kv .k{ color:var(--dim); font-family:var(--mono); font-size:10px; letter-spacing:.06em }
+  .kv .v{ color:var(--text); word-break:normal; overflow-wrap:break-word; white-space:normal; min-width:0 }
+  .kv .v.mono{ font-family:var(--mono); font-size:11px; color:var(--muted) }
+  /* 设置面板 input */
+  .setgrp input[type="text"], .setgrp input[type="number"], .setgrp input[type="range"], .setgrp input:not([type]){
+    width:100%;
+    background:var(--bg); border:1px solid var(--hair); color:var(--text); border-radius:6px;
+    padding:7px 10px; font-family:var(--sans); font-size:12.5px; outline:none;
+  }
+  .setgrp input:focus{ border-color:var(--brass-dim) }
+  .setgrp input[type="range"]{ padding:0; height:6px; accent-color:var(--brass); cursor:pointer; background:transparent; border:none }
+  .setgrp .range-val{ font-family:var(--mono); font-size:11px; color:var(--dim); white-space:nowrap }
   .field{display:flex; flex-direction:column; gap:5px}
   .field label{font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; color:var(--dim); text-transform:uppercase}
   .field input,.field select,.field textarea{
@@ -440,24 +514,27 @@
 <div class="shell">
   <aside class="side">
     <div class="brand">
-      <h1>写作库</h1>
+      <div style="display:flex;align-items:center;gap:8px">
+        <h1 data-i18n="appTitle">写作库</h1>
+        <span class="lang-chip" id="langChip" title="点击在 简中 / EN / 日本語 之间快速切换">简中</span>
+      </div>
       <div class="s" id="brandSub">开发作者 凌空</div>
     </div>
     <div class="sbody">
       <div class="slabel" style="display:flex;align-items:center;justify-content:space-between">
-        <span>内容根</span>
-        <button class="btn" id="btnRootMgr" style="font-size:10px;padding:2px 6px" title="管理内容根">⚙ 管理</button>
+        <span data-i18n="roots">内容根</span>
+        <button class="btn" id="btnRootMgr" style="font-size:10px;padding:2px 6px" data-i18n-title="rootMgr" data-i18n="rootMgr">⚙ 管理</button>
       </div>
       <div id="roots"></div>
-      <div class="slabel">类型</div>
+      <div class="slabel" data-i18n="types">类型</div>
       <div id="genres"></div>
-      <div class="slabel">目录</div>
+      <div class="slabel" data-i18n="dirs">目录</div>
       <div id="tree" class="tree"></div>
     </div>
     <div class="treebox" id="treebox" style="display:none"></div>
     <div class="sidefoot">
-      <button class="btn pri full" id="btnNew">新建文稿</button>
-      <button class="btn" id="btnTheme" title="切换明暗">◐</button>
+      <button class="btn pri full" id="btnNew" data-i18n="btnNew" data-i18n-title="btnNew">新建文稿</button>
+      <button class="btn" id="btnSettings" data-i18n-title="btnSettingsTitle" title="设置">⚙</button>
     </div>
     <div class="side-handle" id="sideHandle" title="拖动调整宽度"></div>
   </aside>
@@ -465,20 +542,20 @@
   <main class="main">
     <div class="topbar">
       <div class="tabs">
-        <button data-tab="docs" class="on">文稿</button>
-        <button data-tab="digest">日报</button>
-        <button data-tab="bench">看板</button>
-        <button data-tab="explorer">资源</button>
+        <button data-tab="docs" class="on" data-i18n="tab_docs">文稿</button>
+        <button data-tab="digest" data-i18n="tab_digest">日报</button>
+        <button data-tab="bench" data-i18n="tab_bench">看板</button>
+        <button data-tab="explorer" data-i18n="tab_explorer">资源</button>
       </div>
       <div class="searchbox">
         <span class="ic">/</span>
         <input id="q" placeholder="搜索标题、目录、摘要" autocomplete="off">
       </div>
       <select id="sort">
-        <option value="mtime">最近修改</option>
-        <option value="words">字数最多</option>
-        <option value="title">标题排序</option>
-        <option value="size">体积最大</option>
+        <option value="mtime" data-i18n="sort_mtime">最近修改</option>
+        <option value="words" data-i18n="sort_words">字数最多</option>
+        <option value="title" data-i18n="sort_title">标题排序</option>
+        <option value="size" data-i18n="sort_size">体积最大</option>
       </select>
     </div>
     <div class="statbar" id="statbar"></div>
@@ -557,6 +634,261 @@ const LS = {
   set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)) } catch(e){} },
   del(k){ try { localStorage.removeItem(k) } catch(e){} }
 };
+/* ════════════════════════ 国际化字典 ════════════════════════
+   语言包只覆盖 UI 框架文案。文件内容、内容根名称、技能名、路径等数据保持原样。 */
+const I18N = {
+  zh: {
+    appTitle: '写作库',
+    brandAuthor: '开发作者',
+    searchPlaceholder: '搜索标题、目录、摘要',
+    searchPlaceholderShort: '/ 搜索',
+    tab_docs: '文稿',
+    tab_digest: '日报',
+    tab_bench: '看板',
+    tab_explorer: '资源',
+    sort_mtime: '最近修改',
+    sort_words: '字数最多',
+    sort_title: '标题排序',
+    sort_size: '体积最大',
+    roots: '内容根',
+    types: '类型',
+    dirs: '目录',
+    all: '全部内容',
+    star: '收藏',
+    noLimit: '不限类型',
+    rootMgr: '管理内容根',
+    autoProbe: '自动探测',
+    autoProbeTip: '服务启动时会自动探测以下 AI 平台的默认数据目录。勾选后加入你的内容根。',
+    manualAdd: '手动添加任意目录（你的权限最高）',
+    manualAddHint: '浏览器安全限制，前端无法直接弹出文件夹选择框。请直接粘贴路径。支持 ~ 展开。',
+    reset: '重置为自动探测',
+    save: '保存',
+    cancel: '取消',
+    dirtyHint: '有未保存的改动',
+    rootProbed: '自动探测到的候选（勾选启用）',
+    setTitle: '设置',
+    setGeneral: '通用',
+    setIndexing: '索引',
+    setPreview: '预览',
+    setRoots: '内容根',
+    setAbout: '关于',
+    setLang: '界面语言',
+    setTheme: '主题',
+    themeDark: '深色',
+    themeLight: '浅色',
+    themeAuto: '跟随系统',
+    setAutoBrowser: '启动时自动打开浏览器',
+    setRefreshOnStart: '启动时自动刷新索引',
+    setMaxItems: '单页最多显示文件数',
+    setPeekWidth: '预览面板默认宽度（px）',
+    setPeekCollapsed: '预览面板默认折叠',
+    setFileExts: '扫描的文件扩展名白名单（逗号分隔）',
+    setIgnoreDirs: '要忽略的目录名（逗号分隔）',
+    setAboutVersion: '版本',
+    setAboutAuthor: '作者',
+    setAboutDataDir: '数据目录',
+    setAboutHelp: '提示',
+    langZh: '简体中文',
+    langEn: 'English',
+    langJa: '日本語',
+    toastSaved: '已保存',
+    toastSavedIndex: '已保存，索引将立即刷新',
+    toastReset: '已回到自动探测',
+    toastRefresh: '索引已刷新',
+    errSave: '保存失败',
+    errDeleteConfirm: '删除 config.json，回到自动探测？当前所有手动配置会丢失。',
+    errAtLeastOne: '至少保留一个内容根',
+    btnNew: '新建文稿',
+    btnThemeTitle: '切换明暗',
+    btnSettingsTitle: '设置',
+    btnReturn: '返回',
+    btnPopoutTitle: '弹出到新窗口',
+    btnHideTitle: '收起预览',
+    btnEdit: '编辑',
+    btnStar: '收藏',
+    btnRefreshTitle: '刷新索引',
+    offlineTitle: '写作库服务未启动',
+    offlineBody: '双击同目录下的 启动写作库.cmd，启动后本页面会自动刷新。',
+    offlineRetry: '我已启动，重试',
+  },
+  en: {
+    appTitle: 'WritingHub',
+    brandAuthor: 'Author',
+    searchPlaceholder: 'Search titles, folders, excerpts',
+    searchPlaceholderShort: '/ Search',
+    tab_docs: 'Docs',
+    tab_digest: 'Daily',
+    tab_bench: 'Board',
+    tab_explorer: 'Explore',
+    sort_mtime: 'Recently modified',
+    sort_words: 'Most words',
+    sort_title: 'By title',
+    sort_size: 'Largest size',
+    roots: 'Roots',
+    types: 'Types',
+    dirs: 'Folders',
+    all: 'All content',
+    star: 'Starred',
+    noLimit: 'Any type',
+    rootMgr: 'Manage roots',
+    autoProbe: 'Auto probe',
+    autoProbeTip: 'On startup the service auto-detects the default data folders of AI platforms below. Tick to add as a root.',
+    manualAdd: 'Add any folder manually (you have full permission)',
+    manualAddHint: 'Browser security blocks native folder pickers. Paste the path directly.  supports ~ expansion.',
+    reset: 'Reset to auto probe',
+    save: 'Save',
+    cancel: 'Cancel',
+    dirtyHint: 'Unsaved changes',
+    rootProbed: 'Auto-detected candidates (tick to enable)',
+    setTitle: 'Settings',
+    setGeneral: 'General',
+    setIndexing: 'Indexing',
+    setPreview: 'Preview',
+    setRoots: 'Roots',
+    setAbout: 'About',
+    setLang: 'Interface language',
+    setTheme: 'Theme',
+    themeDark: 'Dark',
+    themeLight: 'Light',
+    themeAuto: 'Follow system',
+    setAutoBrowser: 'Open browser on start',
+    setRefreshOnStart: 'Refresh index on start',
+    setMaxItems: 'Max items per page',
+    setPeekWidth: 'Default preview width (px)',
+    setPeekCollapsed: 'Collapse preview by default',
+    setFileExts: 'Scanned file extension whitelist (comma separated)',
+    setIgnoreDirs: 'Directory names to ignore (comma separated)',
+    setAboutVersion: 'Version',
+    setAboutAuthor: 'Author',
+    setAboutDataDir: 'Data directory',
+    setAboutHelp: 'Hint',
+    langZh: '简体中文',
+    langEn: 'English',
+    langJa: '日本語',
+    toastSaved: 'Saved',
+    toastSavedIndex: 'Saved, index refreshed',
+    toastReset: 'Reset to auto probe',
+    toastRefresh: 'Index refreshed',
+    errSave: 'Save failed',
+    errDeleteConfirm: 'Delete config.json and return to auto probe? Your manual config will be lost.',
+    errAtLeastOne: 'Keep at least one root',
+    btnNew: 'New document',
+    btnThemeTitle: 'Toggle theme',
+    btnSettingsTitle: 'Settings',
+    btnReturn: 'Back',
+    btnPopoutTitle: 'Pop out',
+    btnHideTitle: 'Collapse',
+    btnEdit: 'Edit',
+    btnStar: 'Star',
+    btnRefreshTitle: 'Refresh index',
+    offlineTitle: 'WritingHub service is not running',
+    offlineBody: 'Double click 启动写作库.cmd in this folder, the page will refresh automatically once it is up.',
+    offlineRetry: 'Retry',
+  },
+  ja: {
+    appTitle: 'WritingHub',
+    brandAuthor: '著者',
+    searchPlaceholder: 'タイトル・フォルダ・要約を検索',
+    searchPlaceholderShort: '/ 検索',
+    tab_docs: '文稿',
+    tab_digest: '日報',
+    tab_bench: 'ボード',
+    tab_explorer: 'リソース',
+    sort_mtime: '最近の変更',
+    sort_words: '文字数順',
+    sort_title: 'タイトル順',
+    sort_size: 'サイズ順',
+    roots: 'コンテンツ根',
+    types: 'タイプ',
+    dirs: 'フォルダ',
+    all: 'すべて',
+    star: 'お気に入り',
+    noLimit: '指定なし',
+    rootMgr: 'ルート管理',
+    autoProbe: '自動検出',
+    autoProbeTip: '起動時に AI プラットフォームのデフォルトフォルダを自動検出します。チェックでルートに追加。',
+    manualAdd: '任意のフォルダを手動追加（管理者権限）',
+    manualAddHint: 'ブラウザのセキュリティでフォルダ選択はブロックされています。パスを直接貼り付けてください。~ 展開対応。',
+    reset: '自動検出にリセット',
+    save: '保存',
+    cancel: 'キャンセル',
+    dirtyHint: '未保存の変更があります',
+    rootProbed: '自動検出候補（チェックで有効）',
+    setTitle: '設定',
+    setGeneral: '一般',
+    setIndexing: '索引',
+    setPreview: 'プレビュー',
+    setRoots: 'ルート',
+    setAbout: '情報',
+    setLang: 'インターフェース言語',
+    setTheme: 'テーマ',
+    themeDark: 'ダーク',
+    themeLight: 'ライト',
+    themeAuto: 'システムに従う',
+    setAutoBrowser: '起動時にブラウザを開く',
+    setRefreshOnStart: '起動時に索引を更新',
+    setMaxItems: '1ページ最大表示数',
+    setPeekWidth: 'プレビュー幅の初期値 (px)',
+    setPeekCollapsed: 'プレビューを初期状態で閉じる',
+    setFileExts: 'スキャンする拡張子（カンマ区切り）',
+    setIgnoreDirs: '無視するフォルダ名（カンマ区切り）',
+    setAboutVersion: 'バージョン',
+    setAboutAuthor: '著者',
+    setAboutDataDir: 'データフォルダ',
+    setAboutHelp: 'ヒント',
+    langZh: '简体中文',
+    langEn: 'English',
+    langJa: '日本語',
+    toastSaved: '保存しました',
+    toastSavedIndex: '保存、索引を更新しました',
+    toastReset: '自動検出にリセットしました',
+    toastRefresh: '索引を更新しました',
+    errSave: '保存に失敗しました',
+    errDeleteConfirm: 'config.json を削除し自動検出に戻しますか？手動設定は失われます。',
+    errAtLeastOne: 'ルートは一つ以上必要です',
+    btnNew: '新規作成',
+    btnThemeTitle: 'テーマ切替',
+    btnSettingsTitle: '設定',
+    btnReturn: '戻る',
+    btnPopoutTitle: '別ウィンドウで開く',
+    btnHideTitle: '閉じる',
+    btnEdit: '編集',
+    btnStar: 'お気に入り',
+    btnRefreshTitle: '索引を更新',
+    offlineTitle: 'WritingHub サービスが起動していません',
+    offlineBody: '同フォルダの 启动写作库.cmd をダブルクリックしてください。起動後このページは自動更新されます。',
+    offlineRetry: '再試行',
+  },
+};
+let G = { lang: LS.get('wh.lang', 'zh'), theme: 'auto', dataDir: '' };
+function _(k){ return (I18N[G.lang] && I18N[G.lang][k]) || (I18N.zh[k] ?? k); }
+function applyI18n(){
+  document.documentElement.lang = G.lang === 'ja' ? 'ja' : (G.lang === 'en' ? 'en' : 'zh-CN');
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = _(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = _(el.dataset.i18nTitle); });
+  document.title = _('appTitle') + ' · WritingHub';
+  const q = $('#q'); if(q) q.placeholder = _('searchPlaceholder');
+}
+function resolveTheme(preference){
+  const p = preference || G.theme || 'auto';
+  if (p === 'auto') {
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  }
+  return p === 'light' ? 'light' : 'dark';
+}
+function applyTheme(pref){
+  G.theme = pref || G.theme || 'auto';
+  const actual = resolveTheme(G.theme);
+  document.documentElement.dataset.theme = actual;
+  LS.set('wh.theme', actual);
+  LS.set('wh.theme.pref', G.theme);
+  const f = document.querySelector('.benchframe');
+  if (f) f.src = '/workbench?embed=1&theme=' + actual;
+}
+window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+  if (G.theme === 'auto') applyTheme('auto');
+});
+
 const S = {
   items: [], meta: null,
   q: '', root: 'all', genre: 'all', dir: null, starOnly: false,
@@ -591,28 +923,53 @@ async function api(url, opt){
   return j;
 }
 
-/* ════════════════════════ 主题 ════════════════════════ */
-(function initTheme(){
-  const t = LS.get('wh.theme', 'dark');
-  document.documentElement.dataset.theme = t;
+/* ════════════════════════ 语言 chip：侧栏顶部快速切换（必须在 initFromLocal 之前声明，否则 TDZ 崩溃） ════════════════════════ */
+const LANG_ORDER = ['zh', 'en', 'ja'];
+const LANG_LABELS = { zh: '简中', en: 'EN', ja: '日本語' };
+const LANG_TITLES = { zh: '简体中文 / Simplified Chinese', en: 'English', ja: '日本語 / Japanese' };
+function updateLangChip(){
+  const c = $('#langChip'); if (!c) return;
+  c.textContent = LANG_LABELS[G.lang] || '简中';
+  c.title = `当前语言：${LANG_TITLES[G.lang] || G.lang} · 点击切换`;
+}
+
+/* ════════════════════════ 主题（旧 initTheme 已合并进 applyTheme） ════════════════════════ */
+(function initFromLocal(){
+  // 启动时先读 localStorage 兜底，等 /api/meta 回来再用后端 appPrefs 覆盖
+  const stored = LS.get('wh.theme.pref', 'auto');
+  G.theme = stored;
+  applyTheme(stored);
+  applyI18n();
+  updateLangChip();
 })();
-$('#btnTheme').onclick = () => {
-  const cur = document.documentElement.dataset.theme;
-  const nxt = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = nxt;
-  LS.set('wh.theme', nxt);
-  const f = document.querySelector('.benchframe');
-  if (f) f.src = '/workbench?embed=1&theme=' + nxt;
-};
+$('#langChip').addEventListener('click', async () => {
+  const nxt = LANG_ORDER[(LANG_ORDER.indexOf(G.lang) + 1) % LANG_ORDER.length];
+  G.lang = nxt;
+  LS.set('wh.lang', nxt);
+  applyI18n();
+  updateLangChip();
+  renderSidebar();  // 侧栏有硬编码中文动态字符串（全部内容/收藏/不限类型），需要重新渲染
+  try { await api('/api/prefs/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ lang: nxt }) }); } catch(e){}
+});
 
 /* ════════════════════════ 数据加载 ════════════════════════ */
 async function loadAll(){
   const [idx, meta] = await Promise.all([api('/api/index'), api('/api/meta')]);
-  if (!idx.ok){ toast(idx.error || '索引读取失败', true); return }
+  if (!idx.ok){ toast(idx.error || _('errSave'), true); return }
   S.items = idx.items || [];
   S.meta = meta;
+  // 用后端 appPrefs 覆盖 localStorage（第一次启动后端无 prefs 时 meta.appPrefs 是默认值）
+  if (meta.appPrefs){
+    if (meta.appPrefs.lang) { G.lang = meta.appPrefs.lang; LS.set('wh.lang', G.lang); }
+    if (meta.appPrefs.theme){ G.theme = meta.appPrefs.theme; LS.set('wh.theme.pref', G.theme); applyTheme(G.theme); }
+    G.peekWidth = meta.appPrefs.peekWidth;
+    G.peekCollapsed = meta.appPrefs.peekCollapsed;
+  }
+  G.dataDir = meta.dataDir || '';
+  applyI18n();
+  updateLangChip();
   const bs = $('#brandSub');
-  if (bs) bs.textContent = `开发作者 ${meta.author || '凌空'} · v${meta.version || 'dev'}`;
+  if (bs) bs.textContent = `${_('brandAuthor')} ${meta.author || '凌空'} · v${meta.version || 'dev'}`;
   renderSidebar();
   renderStatbar();
   renderList();
@@ -638,12 +995,12 @@ function renderSidebar(){
   const c = counts();
   const roots = $('#roots'); roots.innerHTML = '';
   const all = el('button', 'navi' + (S.root==='all' && !S.dir && !S.starOnly ? ' on' : ''));
-  all.innerHTML = '<i class="dot"></i><span class="txt">全部内容</span><span class="n">'+S.items.length+'</span>';
+  all.innerHTML = '<i class="dot"></i><span class="txt">'+_('all')+'</span><span class="n">'+S.items.length+'</span>';
   all.onclick = () => { S.root='all'; S.genre='all'; S.dir=null; S.starOnly=false; renderSidebar(); renderList(); };
   roots.appendChild(all);
 
   const fav = el('button', 'navi' + (S.starOnly ? ' on' : ''));
-  fav.innerHTML = '<i class="dot star"></i><span class="txt">收藏</span><span class="n">'+S.starred.size+'</span>';
+  fav.innerHTML = '<i class="dot star"></i><span class="txt">'+_('star')+'</span><span class="n">'+S.starred.size+'</span>';
   fav.onclick = () => { S.starOnly = !S.starOnly; renderSidebar(); renderList(); };
   roots.appendChild(fav);
   (S.meta?.roots || []).forEach(r => {
@@ -655,7 +1012,7 @@ function renderSidebar(){
 
   const gs = $('#genres'); gs.innerHTML = '';
   const gall = el('button', 'navi' + (S.genre==='all' ? ' on' : ''));
-  gall.innerHTML = '<i class="dot"></i><span class="txt">不限类型</span><span class="n">'+S.items.length+'</span>';
+  gall.innerHTML = '<i class="dot"></i><span class="txt">'+_('noLimit')+'</span><span class="n">'+S.items.length+'</span>';
   gall.onclick = () => { S.genre='all'; renderSidebar(); renderList(); };
   gs.appendChild(gall);
   Object.keys(c.genre).sort((a,b)=> c.genre[b]-c.genre[a]).forEach(g => {
@@ -679,7 +1036,6 @@ function renderSidebar(){
     b.onclick = () => { S.dir = d; renderSidebar(); renderList(); };
     tree.appendChild(b);
   });
-  if (!Object.keys(dirs).filter(Boolean).length) tree.innerHTML = '<div class="navi" style="color:var(--dim);cursor:default">无子目录</div>';
 }
 
 /* ════════════════════════ 统计条 ════════════════════════ */
@@ -1221,6 +1577,170 @@ function closeModal(){ $('#mask').classList.remove('on') }
 $('#btnNew').onclick = openModal;
 $('#nCancel').onclick = closeModal;
 $('#mask').onclick = e => { if (e.target.id === 'mask') closeModal() };
+
+/* ════════════════════════ 设置面板 ════════════════════════ */
+function buildSettingsHTML(){
+  const p = S.meta?.appPrefs || {};
+  const langRow = LANG_ORDER.map(k => {
+    const on = G.lang === k ? ' on' : '';
+    const label = k === 'zh' ? '简体中文' : k === 'en' ? 'English' : '日本語';
+    return `<button type="button" class="btnrow-item${on}" data-lang="${k}">${label}</button>`;
+  }).join('');
+  const themeRow = [['auto',_('themeAuto')],['dark',_('themeDark')],['light',_('themeLight')]].map(([k,l]) => {
+    const on = (G.theme||'auto') === k ? ' on' : '';
+    return `<button type="button" class="btnrow-item${on}" data-theme="${k}">${l}</button>`;
+  }).join('');
+  return `
+  <div class="modal" style="width:min(640px,100%)">
+    <h3>
+      <span>${_('setTitle')}</span>
+      <button class="btn" id="setClose" style="margin-left:auto;font-size:11px;padding:3px 8px">×</button>
+    </h3>
+    <div class="mb">
+
+      <div class="setgrp">
+        <div class="setgrp-title">${_('setGeneral')}</div>
+        <div class="set2">
+          <div>
+            <div class="slbl">${_('setLang')} <span class="en-sub">Language</span></div>
+            <div class="btnrow">${langRow}</div>
+          </div>
+          <div>
+            <div class="slbl">${_('setTheme')} <span class="en-sub">Theme</span></div>
+            <div class="btnrow">${themeRow}</div>
+          </div>
+        </div>
+        <label class="chk-row">
+          <input type="checkbox" id="sAutoBrowser" ${p.autoOpenBrowser===false?'':'checked'}>
+          <span>${_('setAutoBrowser')}</span>
+        </label>
+      </div>
+
+      <div class="setgrp">
+        <div class="setgrp-title">${_('setIndexing')}</div>
+        <div class="srow">
+          <label class="chk-row" style="flex:0 0 auto">
+            <input type="checkbox" id="sRefreshOnStart" ${p.refreshOnStart===false?'':'checked'}>
+            <span>${_('setRefreshOnStart')}</span>
+          </label>
+          <button type="button" class="btn sbtn" id="sRefreshNow">${_('toastRefresh')}</button>
+        </div>
+        <div class="set2">
+          <div>
+            <div class="slbl">${_('setFileExts')}</div>
+            <input id="sExts" value="${(p.fileExts||[]).join(', ')}">
+          </div>
+          <div>
+            <div class="slbl">${_('setMaxItems')}</div>
+            <input id="sMaxItems" type="number" min="100" max="10000" value="${p.maxItems||2000}">
+          </div>
+        </div>
+        <div>
+          <div class="slbl">${_('setIgnoreDirs')}</div>
+          <input id="sIgnore" value="${(p.ignoreDirs||[]).join(', ')}">
+        </div>
+      </div>
+
+      <div class="setgrp">
+        <div class="setgrp-title">${_('setPreview')}</div>
+        <div class="srow">
+          <div style="flex:1;min-width:0">
+            <div class="slbl">${_('setPeekWidth')}</div>
+            <input id="sPeekW" type="range" min="240" max="900" step="20" value="${p.peekWidth||440}">
+          </div>
+          <div class="range-val" id="sPeekWLabel">${p.peekWidth||440} px</div>
+        </div>
+        <label class="chk-row">
+          <input type="checkbox" id="sPeekCollapsed" ${p.peekCollapsed?'checked':''}>
+          <span>${_('setPeekCollapsed')}</span>
+        </label>
+      </div>
+
+      <div class="setgrp">
+        <div class="setgrp-title">${_('setAbout')}</div>
+        <div class="kv">
+          <div class="k">${_('setAboutVersion')}</div>
+          <div class="v">${S.meta?.version || 'dev'}</div>
+          <div class="k">${_('setAboutAuthor')}</div>
+          <div class="v">${S.meta?.author || '凌空'}</div>
+          <div class="k">${_('setAboutDataDir')}</div>
+          <div class="v mono">${G.dataDir || '-'}</div>
+        </div>
+      </div>
+
+    </div>
+    <div class="mf">
+      <span style="font-size:11px;color:var(--dim);margin-right:auto">${_('setAboutHelp')}</span>
+      <button class="btn" id="setCancel">${_('cancel')}</button>
+      <button class="btn pri" id="setSave">${_('save')}</button>
+    </div>
+  </div>`;
+}
+function openSettings(){
+  const mask = $('#mask');
+  mask.innerHTML = buildSettingsHTML();
+  mask.classList.add('on');
+  bindSettings();
+}
+function bindSettings(){
+  $('#setClose').onclick = closeModal;
+  $('#setCancel').onclick = closeModal;
+  $('#mask').onclick = e => { if (e.target.id === 'mask') closeModal() };
+
+  /* 语言按钮组：点就切，即时生效 */
+  document.querySelectorAll('.btnrow-item[data-lang]').forEach(btn => {
+    btn.onclick = async () => {
+      const nxt = btn.dataset.lang;
+      G.lang = nxt;
+      LS.set('wh.lang', nxt);
+      applyI18n();
+      updateLangChip();
+      renderSidebar();
+      // 更新按钮组选中态
+      document.querySelectorAll('.btnrow-item[data-lang]').forEach(b => b.classList.toggle('on', b.dataset.lang === nxt));
+      try { await api('/api/prefs/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ lang: nxt }) }); } catch(e){}
+    };
+  });
+
+  /* 主题按钮组：点就切 */
+  document.querySelectorAll('.btnrow-item[data-theme]').forEach(btn => {
+    btn.onclick = async () => {
+      const nxt = btn.dataset.theme;
+      applyTheme(nxt); LS.set('wh.theme.pref', nxt);
+      document.querySelectorAll('.btnrow-item[data-theme]').forEach(b => b.classList.toggle('on', b.dataset.theme === nxt));
+      try { await api('/api/prefs/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ theme: nxt }) }); } catch(e){}
+    };
+  });
+
+  /* 立即刷新 */
+  const refreshNow = $('#sRefreshNow');
+  if (refreshNow) refreshNow.onclick = async () => { await refreshIndex(); toast(_('toastRefresh')); };
+
+  const peekR = $('#sPeekW');
+  const peekL = $('#sPeekWLabel');
+  peekR.oninput = () => { peekL.textContent = peekR.value + ' px' };
+
+  $('#setSave').onclick = async () => {
+    const extStr = $('#sExts').value;
+    const ignoreStr = $('#sIgnore').value;
+    const payload = {
+      autoOpenBrowser: $('#sAutoBrowser').checked,
+      refreshOnStart: $('#sRefreshOnStart').checked,
+      peekWidth: parseInt(peekR.value, 10) || 440,
+      peekCollapsed: $('#sPeekCollapsed').checked,
+      maxItems: parseInt($('#sMaxItems').value, 10) || 2000,
+      fileExts: extStr.split(',').map(s => s.trim()).filter(Boolean),
+      ignoreDirs: ignoreStr.split(',').map(s => s.trim()).filter(Boolean),
+    };
+    const r = await api('/api/prefs/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
+    if (!r.ok){ toast(r.error || _('errSave'), true); return }
+    LS.set('wh.peekWidth', payload.peekWidth);
+    toast(_('toastSaved'));
+    closeModal();
+    renderSidebar();
+  };
+}
+$('#btnSettings').onclick = openSettings;
 $('#nSave').onclick = async () => {
   const payload = {
     root: $('#nRoot').value,
@@ -1516,7 +2036,7 @@ function rootMgrHTML(){
     <h3 style="display:flex;align-items:center;gap:10px">
       <span>管理内容根</span>
       ${autoStatus}
-      <button class="btn" id="rmClose" style="margin-left:auto;font-size:11px;padding:3px 8px">✕</button>
+      <button class="btn" id="rmClose" style="margin-left:auto;font-size:11px;padding:3px 8px">×</button>
     </h3>
     <div class="mb" style="gap:14px">
       <!-- 当前已启用 -->
@@ -1539,7 +2059,7 @@ function rootMgrHTML(){
       <div class="field">
         <label>手动添加任意目录（你的权限最高）</label>
         <div style="display:flex;gap:6px">
-          <input id="rmPathInput" placeholder="例如 C:\\Users\\10562\\桌面 或 ~/Documents" style="flex:1">
+          <input id="rmPathInput" placeholder="例如 ~/Desktop 或 ~/Documents" style="flex:1">
           <button class="btn" id="rmAddPath">添加</button>
         </div>
         <div class="hint">浏览器安全限制，前端无法直接弹出文件夹选择框。请直接粘贴路径。支持 ~ 展开。</div>

@@ -243,6 +243,7 @@
     <div class="spacer"></div>
     <div class="search"><span class="ic">/</span><input id="q" type="search" placeholder="搜项目、文件、标签" autocomplete="off"></div>
     <button class="iconbtn" id="starBtn" title="只看重点">重点</button>
+    <a class="iconbtn" href="/#settings" title="设置" style="text-decoration:none">⚙</a>
     <button class="iconbtn" id="themeBtn" title="切换明暗">明/暗</button>
     <button class="iconbtn" id="printBtn" title="打印">打印</button>
   </div>
@@ -491,10 +492,10 @@ function renderChrome(counts){
   const author = (META && META.author) || "凌空";
   const ts = (META && META.serverTime) ? fmtTime(META.serverTime) : "";
   const sub = document.getElementById("hdrSub");
-  if (sub) sub.textContent = `开发作者 ${author} · v${v}` + (ts ? " · 数据截至 " + ts : "");
+  if (sub) sub.textContent = `${w_('brandAuthor')} ${author} · v${v}` + (ts ? ` · ${w_('dataAsOf')} ${ts}` : "");
   const foot = document.getElementById("footText");
   if (foot && counts){
-    foot.textContent = `写作工作台 · v${v} · 共 ${counts.items} 个文件 / ${counts.roots} 个内容根 · 数据截至 ${ts}`;
+    foot.textContent = w_('footFmt')(v, counts.items, counts.roots, ts);
   }
 }
 
@@ -543,6 +544,11 @@ async function hydrate(){
     ]);
     idx = idxResp; meta = metaResp;
     META = meta || null;
+    // 用后端 appPrefs 覆盖工作台自己的 localStorage（保证跨页面一致）
+    if (meta && meta.appPrefs){
+      if (meta.appPrefs.lang) { WG.lang = meta.appPrefs.lang; localStorage.setItem('wh.lang', WG.lang); }
+      if (meta.appPrefs.theme) { WG.theme = meta.appPrefs.theme; w_applyTheme(WG.theme); }
+    }
     rootsList = (rootsResp && rootsResp.probed) || [];
   }catch(e){
     // 服务完全没起来 → 显示"启动服务"引导
@@ -726,13 +732,65 @@ $("#starBtn").onclick = () => {
 
 $("#printBtn").onclick = () => window.print();
 
-function setTheme(t){
-  document.documentElement.setAttribute("data-theme", t);
-  localStorage.setItem("wb-workbench-theme", t);
+/* 极简 i18n：工作台只覆盖 chrome/header/footer 里的用户可见格式字符串 */
+const WI18N = {
+  zh: {
+    brandAuthor: '开发作者',
+    dataAsOf: '数据截至',
+    footFmt: (v, items, roots, ts) => `写作工作台 · v${v} · 共 ${items} 个文件 / ${roots} 个内容根 · 数据截至 ${ts}`,
+    tabOverview: '总览', tabTimeline: '时间线', tabMethod: '方法论', tabDaily: '日报',
+    sSkills: '个本机技能', sPrefs: '条协作约定', sFiles: '文件', sWords: '字',
+    vRoots: '内容根', vTime: '最近更新',
+  },
+  en: {
+    brandAuthor: 'Author',
+    dataAsOf: 'as of',
+    footFmt: (v, items, roots, ts) => `Workbench · v${v} · ${items} files / ${roots} roots · data as of ${ts}`,
+    tabOverview: 'Overview', tabTimeline: 'Timeline', tabMethod: 'Method', tabDaily: 'Daily',
+    sSkills: 'skills', sPrefs: 'rules', sFiles: 'files', sWords: 'chars',
+    vRoots: 'roots', vTime: 'recent',
+  },
+  ja: {
+    brandAuthor: '著者',
+    dataAsOf: 'データ',
+    footFmt: (v, items, roots, ts) => `Workbench · v${v} · ${items} ファイル / ${roots} ルート · ${ts} 時点`,
+    tabOverview: '概要', tabTimeline: 'タイムライン', tabMethod: '手法', tabDaily: '日報',
+    sSkills: 'スキル', sPrefs: 'ルール', sFiles: 'ファイル', sWords: '文字',
+    vRoots: 'ルート', vTime: '最近',
+  },
+};
+let WG = { lang: (localStorage.getItem('wh.lang') || 'zh'), theme: 'auto' };
+function w_(k){ return (WI18N[WG.lang] && WI18N[WG.lang][k]) ?? WI18N.zh[k]; }
+function w_resolveTheme(p){
+  p = p || WG.theme || 'auto';
+  if (p === 'auto') {
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+  }
+  return p === 'light' ? 'light' : 'dark';
 }
-$("#themeBtn").onclick = () => setTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark");
+function w_applyTheme(pref){
+  WG.theme = pref || WG.theme || 'auto';
+  document.documentElement.setAttribute('data-theme', w_resolveTheme(WG.theme));
+}
+window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', () => {
+  if (WG.theme === 'auto') w_applyTheme('auto');
+});
 
-setTheme(new URLSearchParams(location.search).get("theme") || localStorage.getItem("wb-workbench-theme") || "dark");
+function setTheme(t){ w_applyTheme(t); localStorage.setItem('wb-workbench-theme.pref', t); }
+$("#themeBtn").onclick = async () => {
+  const order = ['auto', 'dark', 'light'];
+  const nxt = order[(order.indexOf(WG.theme) + 1) % order.length];
+  setTheme(nxt);
+  try { await fetch('/api/prefs/save', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ theme: nxt }) }); } catch(e){}
+};
+// 主题优先级：query > 后端 appPrefs.theme > localStorage.pref > 默认 auto
+const initialTheme = new URLSearchParams(location.search).get('theme');
+if (initialTheme === 'light' || initialTheme === 'dark') {
+  document.documentElement.setAttribute('data-theme', initialTheme);
+} else {
+  WG.theme = localStorage.getItem('wb-workbench-theme.pref') || 'auto';
+  w_applyTheme(WG.theme);
+}
 if (new URLSearchParams(location.search).get("embed") === "1") {
   document.documentElement.setAttribute("data-embed", "1");
 }

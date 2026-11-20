@@ -89,7 +89,7 @@ def _data_dir():
     return _exe_dir()
 
 def _resource_path(*parts):
-    """静态资源优先从 exe 同目录找，找不到 fallback sys._MEIPASS，再 fallback 上级目录（开发时用）"""
+    """静态资源查找顺序：exe 同目录 → _MEIPASS → __file__ 所在目录 → __file__ 上级目录 → exe 上级目录"""
     exe_side = os.path.join(_exe_dir(), *parts)
     if os.path.exists(exe_side):
         return exe_side
@@ -98,11 +98,19 @@ def _resource_path(*parts):
         mp_side = os.path.join(mp, *parts)
         if os.path.exists(mp_side):
             return mp_side
-    # 开发时的 fallback：上级目录（写作工作台.html 常放在项目根目录）
-    parent_side = os.path.join(os.path.dirname(_exe_dir()), *parts)
+    # 开发时：__file__ 同级（写作库/ 目录里有 index.html）
+    here_side = os.path.join(os.path.dirname(os.path.abspath(__file__)), *parts)
+    if os.path.exists(here_side):
+        return here_side
+    # 开发时：__file__ 上级目录（写作工作台.html 在项目根）
+    parent_side = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), *parts)
     if os.path.exists(parent_side):
         return parent_side
-    return exe_side  # 最后返回推测位置，让上层自己判断
+    # 最后兜底：exe 上级目录
+    fallback = os.path.join(os.path.dirname(_exe_dir()), *parts)
+    if os.path.exists(fallback):
+        return fallback
+    return exe_side
 
 BASE_DIR = _data_dir()
 INDEX_HTML = _resource_path("index.html")
@@ -110,6 +118,62 @@ BENCH_HTML = _resource_path("写作工作台.html")
 CONFIG_PATH = os.path.join(BASE_DIR, "config.json")
 
 AUTHOR = "凌空"
+
+APP_PREFS_PATH = os.path.join(BASE_DIR, "prefs.json")
+
+# 全局应用偏好（持久化到 prefs.json）。后端只存这些值本身，前端决定如何渲染。
+DEFAULT_APP_PREFS = {
+    "lang": "zh",                   # zh / en / ja
+    "theme": "auto",                # dark / light / auto
+    "autoOpenBrowser": True,
+    "refreshOnStart": True,         # 每次启动自动刷新索引
+    "peekWidth": 440,               # 预览面板默认宽度（px）
+    "peekCollapsed": False,
+    "maxItems": 2000,
+    "fileExts": [".md", ".markdown", ".txt", ".html", ".htm", ".tex"],
+    "ignoreDirs": ["node_modules", ".git", ".venv", "__pycache__", ".trae"],
+}
+
+def load_app_prefs():
+    """读 prefs.json（不存在返回默认值）"""
+    data = dict(DEFAULT_APP_PREFS)
+    if os.path.exists(APP_PREFS_PATH):
+        try:
+            with open(APP_PREFS_PATH, encoding="utf-8") as f:
+                user = json.load(f)
+            if isinstance(user, dict):
+                data.update(user)
+        except Exception:
+            pass
+    # 类型/取值兜底
+    if data.get("lang") not in ("zh", "en", "ja"):
+        data["lang"] = "zh"
+    if data.get("theme") not in ("dark", "light", "auto"):
+        data["theme"] = "auto"
+    data["peekWidth"] = max(240, min(900, int(data.get("peekWidth", 440))))
+    data["maxItems"] = max(100, min(10000, int(data.get("maxItems", 2000))))
+    if not isinstance(data.get("fileExts"), list):
+        data["fileExts"] = list(DEFAULT_APP_PREFS["fileExts"])
+    if not isinstance(data.get("ignoreDirs"), list):
+        data["ignoreDirs"] = list(DEFAULT_APP_PREFS["ignoreDirs"])
+    for k in ("autoOpenBrowser", "refreshOnStart", "peekCollapsed"):
+        data[k] = bool(data.get(k, DEFAULT_APP_PREFS.get(k, False)))
+    return data
+
+def save_app_prefs(data):
+    """合并更新 prefs.json，只覆盖允许字段"""
+    cur = load_app_prefs()
+    if isinstance(data, dict):
+        for k in DEFAULT_APP_PREFS:
+            if k in data:
+                cur[k] = data[k]
+    try:
+        os.makedirs(BASE_DIR, exist_ok=True)
+        with open(APP_PREFS_PATH, "w", encoding="utf-8") as f:
+            json.dump(cur, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+    return cur
 
 
 def _read_version():
@@ -859,7 +923,18 @@ class Handler(BaseHTTPRequestHandler):
                 "totalSize": sum(i["size"] for i in items),
                 "skills": scan_skills(),
                 "prefs": load_prefs(),
+                "appPrefs": load_app_prefs(),
+                "dataDir": BASE_DIR,
                 "serverTime": time.time(),
+            })
+            return
+
+        if path == "/api/prefs":
+            self.send_json({
+                "ok": True,
+                "prefs": load_app_prefs(),
+                "defaults": DEFAULT_APP_PREFS,
+                "dataDir": BASE_DIR,
             })
             return
 
@@ -1077,6 +1152,15 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json({"ok": False, "error": str(e)}, 400)
             return
 
+        if u.path == "/api/prefs/save":
+            try:
+                data = self.read_body()
+                cur = save_app_prefs(data)
+                self.send_json({"ok": True, "prefs": cur})
+            except Exception as e:
+                self.send_json({"ok": False, "error": str(e)}, 400)
+            return
+
         self.send_json({"ok": False, "error": "未知接口"}, 404)
 
 
@@ -1190,8 +1274,10 @@ def main():
 
     srv.verbose = verbose
 
+    app_prefs = load_app_prefs()
+
     try:
-        items = scan(force=True)
+        items = scan(force=bool(app_prefs.get("refreshOnStart", True)))
     except Exception as e:
         _log(f"首次扫描异常：{e}\n{traceback.format_exc()}")
         items = []
@@ -1213,8 +1299,8 @@ def main():
     for r in ROOTS:
         _log(f"内容根 {r['name']} → {r['path']}")
 
-    # ④ frozen 模式下自动打开浏览器
-    if frozen:
+    # ④ frozen 模式下按偏好决定是否自动打开浏览器
+    if frozen and app_prefs.get("autoOpenBrowser", True):
         try:
             time.sleep(0.8)  # 等服务真的起来
             import webbrowser
